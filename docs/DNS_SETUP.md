@@ -4,58 +4,27 @@ This guide outlines the step-by-step procedure for configuring custom domain rou
 
 ---
 
-## 1. Current Status Summary
+## 1. Project & Current Status Summary
 
-| Host | Type | Target / Value | Current Live Status |
-| :--- | :--- | :--- | :--- |
-| `commonkeyapp.com` (Apex) | `A` | `216.239.32.21`<br>`216.239.34.21`<br>`216.239.36.21`<br>`216.239.38.21` | **Active & Live** (Serving CommonKey landing page with valid TLS) |
-| `commonkeyapp.com` (Apex) | `TXT` | `google-site-verification=BTb4a4...` | **Verified** |
-| `www.commonkeyapp.com` | `CNAME` | `commonkeyapp.com.` | **Action Required**: Needs to be registered as a Redirect Domain in Firebase Console to trigger SSL certificate provisioning |
-
----
-
-## 2. Step-by-Step Configuration
-
-### Step A: Configure the `www` Redirect in Firebase Console
-
-1. Navigate to the **[Firebase Console](https://console.firebase.google.com/)**.
-2. Select your Firebase project hosting the landing page.
-3. In the left navigation sidebar, go to **Build** ➔ **Hosting** (or click **Hosting** under Project Overview).
-4. Under the **Custom domains** table (where `commonkeyapp.com` is listed as *Connected*), click **Add custom domain**.
-5. In the **Domain** field, enter:
-   ```text
-   www.commonkeyapp.com
-   ```
-6. **Important**: Select the checkbox:
-   - **"Redirect www.commonkeyapp.com to an existing website"**
-7. In the dropdown, choose:
-   ```text
-   commonkeyapp.com
-   ```
-8. Click **Save** / **Continue**.
-
-Firebase will now register the domain redirect and automatically request an SSL certificate from Let's Encrypt / Google Trust Services for `www.commonkeyapp.com`.
+- **Firebase Project ID**: `commonkey-landing-2a4a2d`
+- **Default Site URL**: `https://commonkey-landing-2a4a2d.web.app` (Live & Serving with 200 OK)
+- **Apex Domain**: `commonkeyapp.com` (Registered in Firebase Hosting)
+- **Subdomain**: `www.commonkeyapp.com` (Configured to 301/302 redirect to `commonkeyapp.com`)
 
 ---
 
-### Step B: Verify Namecheap DNS Records
+## 2. Namecheap DNS Host Records Table
 
-1. Log into your **[Namecheap Dashboard](https://ap.www.namecheap.com/)**.
-2. Go to **Domain List** ➔ locate `commonkeyapp.com` ➔ click **Manage**.
-3. Under the **Nameservers** section, verify that **Namecheap BasicDNS** or **Namecheap WebHosting DNS** is selected.
-4. Click on the **Advanced DNS** tab.
-5. In the **Host Records** section, ensure your records match the following:
+In your **[Namecheap Dashboard](https://ap.www.namecheap.com/)** ➔ **Domain List** ➔ `commonkeyapp.com` ➔ **Advanced DNS**, update your **Host Records** to match:
 
-| Type | Host | Value / Target | TTL | Notes |
+| Type | Host | Value / Target | TTL | Purpose |
 | :--- | :--- | :--- | :--- | :--- |
-| **A Record** | `@` | `216.239.32.21` | Automatic | Google Edge IP |
-| **A Record** | `@` | `216.239.34.21` | Automatic | Google Edge IP |
-| **A Record** | `@` | `216.239.36.21` | Automatic | Google Edge IP |
-| **A Record** | `@` | `216.239.38.21` | Automatic | Google Edge IP |
-| **TXT Record** | `@` | `google-site-verification=BTb4a4NpVWRjyzcmQ9soUQryrdNj_PpKjZq5YLe9dxM` | Automatic | Domain ownership verification |
-| **CNAME Record** | `www` | `commonkeyapp.com.` | Automatic | Points www to apex (or use A records if instructed by Firebase Console) |
+| **A Record** | `@` | `199.36.158.100` | Automatic (or 1 min) | Primary Firebase Hosting IP |
+| **TXT Record** | `@` | `hosting-site=commonkey-landing-2a4a2d` | Automatic (or 1 min) | Firebase Site Ownership Verification |
+| **TXT Record** | `@` | `google-site-verification=BTb4a4NpVWRjyzcmQ9soUQryrdNj_PpKjZq5YLe9dxM` | Automatic | Google Workspace / Search Console |
+| **CNAME Record** | `www` | `commonkey-landing-2a4a2d.web.app.` | Automatic (or 1 min) | Redirect `www` to Firebase Site |
 
-> **Note on CNAME:** If Namecheap requires an unpunctuated domain, enter `commonkeyapp.com` without the trailing dot. If Firebase Console presents specific `A` records (such as `199.36.158.100`) for `www`, replace the CNAME with those A records.
+> **Note on Existing Records:** Remove any outdated `216.239.*` A records or legacy CNAME pointing to `commonkeyapp.com` in Namecheap to prevent ACME SSL certificate issuance conflicts.
 
 ---
 
