@@ -1,0 +1,22 @@
+# robots.txt for CommonKey (https://commonkey.com.au)
+User-agent: *
+Allow: /
+
+# Explicitly allow AI Search and Knowledge Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Sitemap reference
+Sitemap: https://commonkey.com.au/sitemap.xml

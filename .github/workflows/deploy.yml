@@ -1,0 +1,83 @@
+name: CI/CD & Deploy to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Permissions required for Git checkout and Google Workload Identity Federation OIDC token exchange
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  # ----------------------------------------------------------------------------
+  # Job 1: Quality, Tests & Vulnerability Checks
+  # ----------------------------------------------------------------------------
+  verify:
+    name: Verify & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Type Check (TypeScript)
+        run: npm run lint
+
+      - name: Run Test Suite (Vitest)
+        run: npm test
+
+      - name: Security Vulnerability Audit
+        run: npm audit --audit-level=high
+
+  # ----------------------------------------------------------------------------
+  # Job 2: Build & Keyless Deploy via Workload Identity Federation
+  # ----------------------------------------------------------------------------
+  deploy:
+    name: Deploy to Firebase Hosting Live
+    needs: [verify]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Static Production Assets
+        run: npm run build
+
+      - name: Authenticate to Google Cloud via Workload Identity Federation (WIF)
+        id: gcp-auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          token_format: access_token
+
+      - name: Deploy to Firebase Hosting (Live Channel)
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ steps.gcp-auth.outputs.access_token }}
+          channelId: live
+          projectId: ${{ secrets.GCP_PROJECT_ID }}
