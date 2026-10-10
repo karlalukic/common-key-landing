@@ -40,6 +40,14 @@ This repository hosts the marketing, informational, and resource portal for Comm
    ```
    Open [http://localhost:5173](http://localhost:5173) in your browser. Hot Module Replacement (HMR) is enabled.
 
+4. **Verify all checks before pushing:**
+   ```bash
+   npm run verify
+   ```
+   Runs TypeScript type checking, 140+ unit/component tests, dependency security audit, and production build in one single command.
+
+> 📖 **Complete Step-by-Step Guide:** See **[docs/DEVELOPER_WORKFLOW.md](docs/DEVELOPER_WORKFLOW.md)** for our full development lifecycle, TDD workflow, pre-push checklist, CI/CD monitoring, and rollback strategies.
+
 ---
 
 ## 🧪 Testing & Quality Assurance
@@ -48,6 +56,7 @@ The codebase includes an extensive automated test suite powered by **Vitest** an
 
 | Command | Description |
 | :--- | :--- |
+| `npm run verify` | **Primary Pre-Push Check:** Runs lint, all 140+ Vitest tests, audit, and build in one shot. |
 | `npm test` | Runs the full Vitest suite (140+ unit/component tests across 6 suites). |
 | `npm run test:watch` | Runs tests in interactive watch mode for TDD. |
 | `npm run lint` | Runs TypeScript compiler checks (`tsc --noEmit`) with zero error tolerance. |
@@ -104,6 +113,7 @@ common-key-landing/
 │       └── deploy.yml          # Dual-stage CI/CD: Quality Verification + Keyless WIF Deployment
 ├── docs/
 │   ├── ARCHITECTURE.md         # Technical architecture & deployment flow
+│   ├── DEVELOPER_WORKFLOW.md   # Step-by-step development, testing, release & rollback guide
 │   └── DNS_SETUP.md            # Namecheap custom domain & DNS configuration reference
 ├── public/
 │   ├── favicon.svg             # CommonKey brand favicon
