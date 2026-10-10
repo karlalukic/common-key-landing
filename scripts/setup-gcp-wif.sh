@@ -171,11 +171,15 @@ else
     --display-name="$SA_DISPLAY_NAME"
 fi
 
-# 6. Grant Firebase Admin Role
-echo "Granting Firebase Hosting Admin role to Service Account..."
+# 6. Grant Firebase Admin Role & Service Usage Viewer
+echo "Granting Firebase Hosting Admin and Service Usage Viewer roles to Service Account..."
 run_cmd gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${SA_EMAIL}" \
   --role="roles/firebasehosting.admin" \
+  --condition=None
+run_cmd gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/serviceusage.serviceUsageViewer" \
   --condition=None
 
 # 7. Get Project Number

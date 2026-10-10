@@ -72,12 +72,8 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
-          token_format: access_token
+          create_credentials_file: true
 
       - name: Deploy to Firebase Hosting (Live Channel)
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ steps.gcp-auth.outputs.access_token }}
-          channelId: live
-          projectId: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          npx --yes firebase-tools deploy --only hosting --project ${{ secrets.GCP_PROJECT_ID }} --non-interactive
