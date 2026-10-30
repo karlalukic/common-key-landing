@@ -27,24 +27,27 @@ import {
   Sparkles, 
   Plus, 
   Minus, 
-  Copyright,
   Copy,
   Check,
   ArrowUp
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import ArticlesPage from './components/ArticlesPage';
+import TermsOfServicePage from './components/TermsOfServicePage';
+import PrivacyPolicyPage from './components/PrivacyPolicyPage';
+import SecurityPage from './components/SecurityPage';
+import InterestFormSection from './components/InterestFormSection';
 import { getAllArticles, Article } from './data/articles';
 
-const CALENDAR_LINK = "https://calendar.app.google/8LsRqfY3xuX15yQa7";
+const CALENDAR_LINK = "https://calendar.app.google/LnCqDH1YajG5Wx417";
 
 // Assets provided
 const ASSETS = {
-  dashboard: "https://ik.imagekit.io/vgcja8lfq/CommonKey/Dashboard.png",
-  compliance: "https://ik.imagekit.io/vgcja8lfq/CommonKey/Compliance%20Matrix%20(Action%20Required).png",
-  projects: "https://ik.imagekit.io/vgcja8lfq/CommonKey/Projects.png",
-  activityLog: "https://ik.imagekit.io/vgcja8lfq/CommonKey/Activity%20Log.png",
-  documents: "https://ik.imagekit.io/vgcja8lfq/CommonKey/Dashboard.png"
+  dashboard: "/assets/Dashboard.png",
+  compliance: "/assets/Compliance.png",
+  projects: "/assets/Projects table.png",
+  activityLog: "/assets/Activity Log.png",
+  documents: "/assets/Research Hub.png"
 };
 
 const FadeIn = ({ 
@@ -171,7 +174,7 @@ const BrowserFrame = ({
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [currentView, setCurrentView] = useState<'landing' | 'articles'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'articles' | 'terms' | 'privacy' | 'security'>('landing');
   const [currentArticleSlug, setCurrentArticleSlug] = useState<string | undefined>(undefined);
   const [articles, setArticles] = useState<Article[]>(() => getAllArticles() || []);
   const [lotsCount, setLotsCount] = useState<number>(12);
@@ -195,17 +198,31 @@ export default function App() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [copiedProposal, setCopiedProposal] = useState(false);
 
-  // Synchronize routing with window.location.hash
+  // Synchronize routing with window.location.pathname and window.location.hash
   useEffect(() => {
-    const handleHashChange = () => {
+    const handleRouteChange = () => {
       const hash = window.location.hash;
+      const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+
       if (hash.startsWith('#/articles/')) {
         const slug = hash.replace('#/articles/', '').split('?')[0];
         setCurrentView('articles');
         setCurrentArticleSlug(slug || undefined);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (hash === '#/articles' || hash === '#articles') {
+      } else if (hash === '#/articles' || hash === '#articles' || pathname === '/articles') {
         setCurrentView('articles');
+        setCurrentArticleSlug(undefined);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (hash === '#/terms' || hash === '#terms' || pathname === '/terms') {
+        setCurrentView('terms');
+        setCurrentArticleSlug(undefined);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (hash === '#/privacy' || hash === '#privacy' || pathname === '/privacy') {
+        setCurrentView('privacy');
+        setCurrentArticleSlug(undefined);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (hash === '#/security' || hash === '#security' || pathname === '/security') {
+        setCurrentView('security');
         setCurrentArticleSlug(undefined);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
@@ -220,9 +237,13 @@ export default function App() {
       }
     };
 
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    handleRouteChange();
+    window.addEventListener('hashchange', handleRouteChange);
+    window.addEventListener('popstate', handleRouteChange);
+    return () => {
+      window.removeEventListener('hashchange', handleRouteChange);
+      window.removeEventListener('popstate', handleRouteChange);
+    };
   }, []);
 
   // Listen to scroll for back-to-top and keyboard for escape
@@ -256,6 +277,9 @@ Walkthrough: ${CALENDAR_LINK}`;
   };
 
   const navigateToArticles = (slug?: string) => {
+    if (window.location.pathname !== '/') {
+      window.history.pushState({}, '', '/');
+    }
     if (slug) {
       window.location.hash = `#/articles/${slug}`;
       setCurrentArticleSlug(slug);
@@ -267,7 +291,34 @@ Walkthrough: ${CALENDAR_LINK}`;
     setMobileMenuOpen(false);
   };
 
+  const navigateToTerms = () => {
+    window.history.pushState({}, '', '/terms');
+    setCurrentView('terms');
+    setCurrentArticleSlug(undefined);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setMobileMenuOpen(false);
+  };
+
+  const navigateToPrivacy = () => {
+    window.history.pushState({}, '', '/privacy');
+    setCurrentView('privacy');
+    setCurrentArticleSlug(undefined);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setMobileMenuOpen(false);
+  };
+
+  const navigateToSecurity = () => {
+    window.history.pushState({}, '', '/security');
+    setCurrentView('security');
+    setCurrentArticleSlug(undefined);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setMobileMenuOpen(false);
+  };
+
   const navigateToHomeSection = (sectionId?: string) => {
+    if (window.location.pathname !== '/') {
+      window.history.pushState({}, '', '/');
+    }
     setCurrentView('landing');
     setCurrentArticleSlug(undefined);
     if (sectionId) {
@@ -435,7 +486,7 @@ Walkthrough: ${CALENDAR_LINK}`;
         )}
       </header>
 
-      {/* VIEW SWITCHER: ARTICLES vs LANDING PAGE */}
+      {/* VIEW SWITCHER: ARTICLES vs TERMS vs PRIVACY vs SECURITY vs LANDING PAGE */}
       {currentView === 'articles' ? (
         <ArticlesPage
           articles={articles || []}
@@ -444,6 +495,18 @@ Walkthrough: ${CALENDAR_LINK}`;
           onBackToArticles={() => navigateToArticles()}
           onGoHome={() => navigateToHomeSection()}
           calendarLink={CALENDAR_LINK}
+        />
+      ) : currentView === 'terms' ? (
+        <TermsOfServicePage
+          onGoHome={() => navigateToHomeSection()}
+        />
+      ) : currentView === 'privacy' ? (
+        <PrivacyPolicyPage
+          onGoHome={() => navigateToHomeSection()}
+        />
+      ) : currentView === 'security' ? (
+        <SecurityPage
+          onGoHome={() => navigateToHomeSection()}
         />
       ) : (
         <>
@@ -467,7 +530,7 @@ Walkthrough: ${CALENDAR_LINK}`;
 
                 {/* CTAs */}
                 <FadeIn delay={0.3}>
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
                     <Button href={CALENDAR_LINK} className="w-full sm:w-auto px-8 py-3.5 text-base shadow-lg shadow-blue-600/20 group">
                       Book a 30-Minute Walkthrough
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform inline-block" />
@@ -475,6 +538,19 @@ Walkthrough: ${CALENDAR_LINK}`;
                     <Button href="#features" primary={false} className="w-full sm:w-auto px-7 py-3.5 text-base">
                       Explore Features
                     </Button>
+                  </div>
+                  <div className="mb-5">
+                    <a
+                      href="#register-interest"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigateToHomeSection('#register-interest');
+                      }}
+                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      <span>Not ready for a demo? Leave your details instead &rarr;</span>
+                    </a>
                   </div>
                   <p className="text-xs sm:text-sm text-slate-500 italic">
                     Purpose-built for Australian Body Corporates, Strata Schemes, and Owners Corporations.
@@ -500,10 +576,10 @@ Walkthrough: ${CALENDAR_LINK}`;
                     </div>
 
                     {/* Column 2: Clock */}
-                    <div className="bg-white/95 backdrop-blur-sm border border-slate-200/90 border-t-2 border-t-indigo-500 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200 group flex flex-col justify-between">
+                    <div className="bg-white/95 backdrop-blur-sm border border-slate-200/90 border-t-2 border-t-amber-500 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200 group flex flex-col justify-between">
                       <div>
-                        <div className="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200/60 flex items-center justify-center mb-4 transition-colors group-hover:bg-indigo-100">
-                          <Clock className="w-5 h-5 text-indigo-600" />
+                        <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center justify-center mb-4 transition-colors group-hover:bg-amber-100">
+                          <Clock className="w-5 h-5 text-amber-600" />
                         </div>
                         <h3 className="font-bold text-slate-950 text-lg mb-2 tracking-tight">
                           Reclaim Your Time
@@ -531,15 +607,6 @@ Walkthrough: ${CALENDAR_LINK}`;
                   </div>
                 </FadeIn>
               </div>
-
-              {/* Hero Visual - Real Screenshot wrapped in BrowserFrame */}
-              <FadeIn delay={0.4} className="mt-12 sm:mt-14 max-w-5xl mx-auto">
-                <BrowserFrame 
-                  src={ASSETS.dashboard} 
-                  alt="CommonKey Committee Governance Dashboard"
-                  badge="Executive Overview"
-                />
-              </FadeIn>
             </div>
           </section>
 
@@ -732,6 +799,23 @@ Walkthrough: ${CALENDAR_LINK}`;
           {/* 5. CORE MODULES / FEATURES */}
           <section id="features" className="py-24 bg-white border-b border-slate-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              {/* Action-First Dashboard Overview */}
+              <FadeIn className="max-w-5xl mx-auto mb-24 sm:mb-28">
+                <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight mb-4 text-balance">
+                    Built for the Heavy Lifters—and the &ldquo;Just Tell Me Where to Vote&rdquo; Members.
+                  </h2>
+                  <p className="text-slate-600 text-base sm:text-lg leading-relaxed text-balance">
+                    Whether you&apos;re driving every project or only checking in once a month, you shouldn&apos;t have to dig through weeks of emails to know what&apos;s happening. Open one screen that shows only what needs your action today—review the quote, cast your vote in 60 seconds, and get back to your life.
+                  </p>
+                </div>
+                <BrowserFrame 
+                  src={ASSETS.dashboard} 
+                  alt="CommonKey Committee Governance Dashboard"
+                  badge="Executive Overview"
+                />
+              </FadeIn>
+
               <div className="max-w-3xl mx-auto text-center mb-20">
                 <FadeIn>
                   <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight mb-4">
@@ -1136,7 +1220,18 @@ Walkthrough: ${CALENDAR_LINK}`;
                               </Button>
 
                               <p className="text-xs text-slate-500 font-medium text-center">
-                                Grab a 15-minute time slot to secure your introductory pricing.
+                                Grab a 15-minute time slot to secure your introductory pricing, or{' '}
+                                <a
+                                  href="#register-interest"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    navigateToHomeSection('#register-interest');
+                                  }}
+                                  className="text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer"
+                                >
+                                  leave your details here
+                                </a>
+                                .
                               </p>
 
                               <button
@@ -1323,6 +1418,9 @@ Walkthrough: ${CALENDAR_LINK}`;
             </div>
           </section>
 
+          {/* 8. REGISTER INTEREST WEBFORM */}
+          <InterestFormSection calendarLink={CALENDAR_LINK} />
+
           {/* 9. CONVERSION CTA */}
           <section className="py-24 bg-slate-950 text-white relative overflow-hidden">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
@@ -1335,13 +1433,21 @@ Walkthrough: ${CALENDAR_LINK}`;
                 <p className="text-lg sm:text-xl text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed text-balance">
                   Protect your building's history, eliminate single-person dependency, and reclaim your weekends. Lock in the Founding Committee rate before spots fill up for the year.
                 </p>
-                <div className="mb-10">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
                   <Button 
                     href={CALENDAR_LINK}
                     className="w-full sm:w-auto px-8 sm:px-10 py-4 text-base sm:text-lg shadow-xl shadow-blue-600/30 group"
                   >
                     Claim Your Spot: Book a 30-Minute Walkthrough
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform inline-block" />
+                  </Button>
+                  <Button
+                    href="#register-interest"
+                    primary={false}
+                    onClick={() => navigateToHomeSection('#register-interest')}
+                    className="w-full sm:w-auto px-7 py-4 text-base sm:text-lg"
+                  >
+                    Leave Your Details Instead
                   </Button>
                 </div>
 
@@ -1388,7 +1494,6 @@ Walkthrough: ${CALENDAR_LINK}`;
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 text-xs">
             <div className="flex items-center gap-1.5 text-slate-400">
-              <Copyright className="w-3.5 h-3.5 text-slate-500" />
               <span>© 2026 CommonKey. All rights reserved.</span>
             </div>
 
@@ -1411,9 +1516,36 @@ Walkthrough: ${CALENDAR_LINK}`;
               >
                 Articles
               </button>
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Security & Data Ownership</a>
+              <a
+                href="/privacy"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToPrivacy();
+                }}
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="/terms"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToTerms();
+                }}
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                Terms of Service
+              </a>
+              <a
+                href="/security"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToSecurity();
+                }}
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                Security & Data Ownership
+              </a>
               <a href={CALENDAR_LINK} className="hover:text-white transition-colors">Contact</a>
             </div>
           </div>

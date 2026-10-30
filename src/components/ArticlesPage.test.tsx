@@ -81,7 +81,7 @@ describe('ArticlesPage Component', () => {
     onSelectArticle: vi.fn(),
     onBackToArticles: vi.fn(),
     onGoHome: vi.fn(),
-    calendarLink: 'https://calendar.app.google/8LsRqfY3xuX15yQa7',
+    calendarLink: 'https://calendar.app.google/LnCqDH1YajG5Wx417',
   };
 
   beforeEach(() => {

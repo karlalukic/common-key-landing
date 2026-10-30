@@ -4,6 +4,7 @@ import App from './App';
 
 describe('App Component', () => {
   beforeEach(() => {
+    window.history.pushState({}, '', '/');
     window.location.hash = '';
     vi.clearAllMocks();
   });
@@ -88,7 +89,7 @@ describe('App Component', () => {
       render(<App />);
       const walkthroughLinks = screen.getAllByRole('link', { name: /Book a 30-Minute Walkthrough/i });
       expect(walkthroughLinks.length).toBeGreaterThanOrEqual(1);
-      expect(walkthroughLinks[0]).toHaveAttribute('href', 'https://calendar.app.google/8LsRqfY3xuX15yQa7');
+      expect(walkthroughLinks[0]).toHaveAttribute('href', 'https://calendar.app.google/LnCqDH1YajG5Wx417');
       expect(walkthroughLinks[0]).toHaveAttribute('target', '_blank');
       expect(walkthroughLinks[0]).toHaveAttribute('rel', 'noopener noreferrer');
     });
@@ -106,11 +107,16 @@ describe('App Component', () => {
       expect(screen.getByRole('heading', { name: /Eliminate Hidden Fees/i })).toBeInTheDocument();
     });
 
-    it('renders the primary dashboard screenshot frame', () => {
+    it('renders the primary dashboard screenshot frame and action-first lead-in copy', () => {
       render(<App />);
+      expect(
+        screen.getByRole('heading', {
+          name: /Built for the Heavy Lifters—and the “Just Tell Me Where to Vote” Members\./i,
+        })
+      ).toBeInTheDocument();
       const dashboardImg = screen.getByAltText(/CommonKey Committee Governance Dashboard/i);
       expect(dashboardImg).toBeInTheDocument();
-      expect(dashboardImg).toHaveAttribute('src', 'https://ik.imagekit.io/vgcja8lfq/CommonKey/Dashboard.png');
+      expect(dashboardImg).toHaveAttribute('src', '/assets/Dashboard.png');
     });
   });
 
@@ -334,6 +340,77 @@ describe('App Component', () => {
       render(<App />);
       expect(screen.getByText(/© 2026 CommonKey\. All rights reserved\./i)).toBeInTheDocument();
       expect(screen.getByRole('contentinfo')).toBeInTheDocument();
+    });
+
+    it('links Terms of Service in the footer to /terms and navigates to TermsOfServicePage when clicked', () => {
+      render(<App />);
+      const termsLink = screen.getByRole('link', { name: /Terms of Service/i });
+      expect(termsLink).toBeInTheDocument();
+      expect(termsLink).toHaveAttribute('href', '/terms');
+
+      fireEvent.click(termsLink);
+
+      expect(window.location.pathname).toBe('/terms');
+      expect(screen.getByRole('heading', { level: 1, name: /Terms of Service/i })).toBeInTheDocument();
+      expect(screen.getByText(/October 27, 2026/i)).toBeInTheDocument();
+      expect(screen.getByText(/Mykrolabs Pty Ltd \(ACN 655 532 086 \/ ABN 23 655 532 086\)/i)).toBeInTheDocument();
+    });
+
+    it('renders TermsOfServicePage when directly visiting /terms path or #/terms hash', () => {
+      window.history.pushState({}, '', '/terms');
+      render(<App />);
+
+      expect(screen.getByRole('heading', { level: 1, name: /Terms of Service/i })).toBeInTheDocument();
+      expect(screen.getByText(/6\.3 Renewals & Price Increases:/i)).toBeInTheDocument();
+    });
+
+    it('links Privacy Policy in the footer to /privacy and navigates to PrivacyPolicyPage when clicked', () => {
+      render(<App />);
+      const privacyLink = screen.getByRole('link', { name: /Privacy Policy/i });
+      expect(privacyLink).toBeInTheDocument();
+      expect(privacyLink).toHaveAttribute('href', '/privacy');
+
+      fireEvent.click(privacyLink);
+
+      expect(window.location.pathname).toBe('/privacy');
+      expect(screen.getByRole('heading', { level: 1, name: /Privacy Policy/i })).toBeInTheDocument();
+      expect(screen.getByText(/October 27, 2026/i)).toBeInTheDocument();
+      expect(screen.getByText(/Privacy Act 1988 \(Cth\)/i)).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /www\.oaic\.gov\.au/i })).toHaveAttribute('href', 'https://www.oaic.gov.au');
+    });
+
+    it('renders PrivacyPolicyPage when directly visiting /privacy path', () => {
+      window.history.pushState({}, '', '/privacy');
+      render(<App />);
+
+      expect(screen.getByRole('heading', { level: 1, name: /Privacy Policy/i })).toBeInTheDocument();
+      expect(screen.getByText(/3\. Cloud Data Sovereignty, Sub-Processors & Cross-Border Disclosure \(APP 8\)/i)).toBeInTheDocument();
+    });
+
+    it('links Security & Data Ownership in the footer to /security and navigates to SecurityPage when clicked', () => {
+      render(<App />);
+      const securityLink = screen.getByRole('link', { name: /Security & Data Ownership/i });
+      expect(securityLink).toBeInTheDocument();
+      expect(securityLink).toHaveAttribute('href', '/security');
+
+      fireEvent.click(securityLink);
+
+      expect(window.location.pathname).toBe('/security');
+      expect(
+        screen.getByRole('heading', { level: 1, name: /Your Building’s History Belongs to Your Building—Period\./i })
+      ).toBeInTheDocument();
+      expect(screen.getByText(/1\. 100% Customer & Scheme Data Sovereignty/i)).toBeInTheDocument();
+      expect(screen.getByText(/Karla Lukic/i)).toBeInTheDocument();
+    });
+
+    it('renders SecurityPage when directly visiting /security path', () => {
+      window.history.pushState({}, '', '/security');
+      render(<App />);
+
+      expect(
+        screen.getByRole('heading', { level: 1, name: /Your Building’s History Belongs to Your Building—Period\./i })
+      ).toBeInTheDocument();
+      expect(screen.getByText(/2\. Australian Primary Data Residency & Enterprise Cloud Security/i)).toBeInTheDocument();
     });
   });
 });
