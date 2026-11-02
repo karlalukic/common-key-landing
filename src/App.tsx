@@ -38,6 +38,12 @@ import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import SecurityPage from './components/SecurityPage';
 import InterestFormSection from './components/InterestFormSection';
 import { getAllArticles, Article } from './data/articles';
+import {
+  trackPricingClick,
+  trackCalculatorInteraction,
+  trackWalkthroughClick,
+  trackScrollDepth,
+} from './utils/analytics';
 
 const CALENDAR_LINK = "https://calendar.app.google/LnCqDH1YajG5Wx417";
 
@@ -84,7 +90,7 @@ const Button = ({
   className?: string,
   onClick?: () => void
 }) => {
-  const baseStyle = "inline-flex items-center justify-center font-semibold transition-all duration-200 rounded-xl whitespace-nowrap text-sm sm:text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 active:scale-[0.99] cursor-pointer";
+  const baseStyle = "inline-flex items-center justify-center font-semibold transition-all duration-200 rounded-xl sm:whitespace-nowrap text-center text-sm sm:text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 active:scale-[0.99] cursor-pointer";
   const primaryStyle = "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md hover:shadow-blue-600/20 px-5 sm:px-6 py-2.5 sm:py-3";
   const secondaryStyle = "bg-white text-slate-800 hover:bg-slate-50 border border-slate-200 shadow-sm hover:border-slate-300 px-5 sm:px-6 py-2.5 sm:py-3";
 
@@ -112,7 +118,7 @@ const Button = ({
   );
 };
 
-// Modern Browser Frame Component wrapping ImageKit screenshots with zero-broken-image resilience
+// Modern Window Frame Component with deep institutional navy (#0F172A) contrast and clean macOS header
 const BrowserFrame = ({ 
   src, 
   alt, 
@@ -127,45 +133,41 @@ const BrowserFrame = ({
   const [imgError, setImgError] = useState(false);
 
   return (
-    <div className={`rounded-2xl border border-slate-200/90 bg-white shadow-xl shadow-slate-900/5 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-slate-900/10 ${className}`}>
-      {/* Browser header bar */}
-      <div className="h-10 bg-slate-50/95 border-b border-slate-200/80 px-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+    <div className={`rounded-xl sm:rounded-2xl bg-[#0F172A] p-1.5 sm:p-2 shadow-xl border border-slate-800/80 ${className}`}>
+      <div className="rounded-lg sm:rounded-xl border border-slate-200/80 bg-white shadow-sm overflow-hidden transition-all duration-300">
+        {/* Clean standard macOS window header (three subtle dots on top-left, no fake browser tabs) */}
+        <div className="h-7 sm:h-8 bg-slate-50/95 border-b border-slate-200/80 px-3 flex items-center justify-between">
           <div className="flex gap-1.5" aria-hidden="true">
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-300 border border-slate-400/30" />
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-300 border border-slate-400/30" />
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-300 border border-slate-400/30" />
+            <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-slate-300 border border-slate-400/30" />
+            <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-slate-300 border border-slate-400/30" />
+            <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-slate-300 border border-slate-400/30" />
           </div>
-          <div className="flex items-center gap-1.5 ml-2 sm:ml-3 px-2.5 sm:px-3 py-1 bg-white border border-slate-200 rounded-md text-[10px] sm:text-[11px] text-slate-600 font-mono shadow-2xs">
-            <Lock className="w-3 h-3 text-emerald-600 shrink-0" />
-            <span>CommonKey.app</span>
-          </div>
+          {badge && (
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">
+              {badge}
+            </span>
+          )}
         </div>
-        {badge && (
-          <span className="text-[11px] font-semibold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">
-            {badge}
-          </span>
-        )}
-      </div>
 
-      {/* Screenshot container */}
-      <div className="relative bg-slate-100 min-h-[220px]">
-        {imgError ? (
-          <div className="p-12 text-center flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 min-h-[300px]">
-            <Building2 className="w-12 h-12 text-blue-600 mb-3 opacity-80" />
-            <h4 className="font-bold text-slate-900 text-base mb-1">{alt}</h4>
-            <p className="text-xs text-slate-500 max-w-sm">Secure, cloud-hosted strata governance interface.</p>
-          </div>
-        ) : (
-          <img 
-            src={src} 
-            alt={alt} 
-            onError={() => setImgError(true)}
-            className="w-full h-auto object-cover block transition-opacity duration-300"
-            loading="lazy"
-            referrerPolicy="no-referrer"
-          />
-        )}
+        {/* Screenshot container */}
+        <div className="relative bg-slate-100 min-h-[220px]">
+          {imgError ? (
+            <div className="p-12 text-center flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 min-h-[300px]">
+              <Building2 className="w-12 h-12 text-blue-600 mb-3 opacity-80" />
+              <h4 className="font-bold text-slate-900 text-base mb-1">{alt}</h4>
+              <p className="text-xs text-slate-500 max-w-sm">Secure, cloud-hosted strata governance interface.</p>
+            </div>
+          ) : (
+            <img 
+              src={src} 
+              alt={alt} 
+              onError={() => setImgError(true)}
+              className="w-full h-auto object-cover block transition-opacity duration-300"
+              loading="lazy"
+              referrerPolicy="no-referrer"
+            />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -246,10 +248,21 @@ export default function App() {
     };
   }, []);
 
-  // Listen to scroll for back-to-top and keyboard for escape
+  // Listen to scroll for back-to-top, scroll depth tracking, and keyboard for escape
   useEffect(() => {
+    const firedDepths = new Set<number>();
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight > 0) {
+        const scrollPercent = Math.round((window.scrollY / docHeight) * 100);
+        [25, 50, 75, 100].forEach((milestone) => {
+          if (scrollPercent >= milestone && !firedDepths.has(milestone)) {
+            firedDepths.add(milestone);
+            trackScrollDepth(milestone);
+          }
+        });
+      }
     };
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMobileMenuOpen(false);
@@ -263,11 +276,12 @@ export default function App() {
   }, []);
 
   const handleCopyProposal = () => {
+    trackCalculatorInteraction('copy_proposal', effectiveLots, calculatedAnnualCost);
     const summaryText = `Proposal for Strata Committee:
 Scheme: ${effectiveLots} lots
 CommonKey Annual Subscription: $${calculatedAnnualCost.toLocaleString()} + GST / year ($${Math.round(calculatedAnnualCost / effectiveLots)}/lot/year ≈ $${(calculatedAnnualCost / effectiveLots / 52).toFixed(2)}/week per lot)
 Payment Source: Administrative Fund (Standard governance tool, can be approved by simple committee vote)
-Includes: Statutory Compliance Matrix, Project Management & Quote Comparisons, Immutable Activity Ledger, Free White-Glove Migration Setup.
+Includes: Statutory Compliance Register, Project Management & Quote Comparisons, Immutable Activity Ledger, Free White-Glove Migration Setup.
 Walkthrough: ${CALENDAR_LINK}`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(summaryText);
@@ -339,9 +353,9 @@ Walkthrough: ${CALENDAR_LINK}`;
   };
 
   const navLinks = [
-    { label: 'Features', href: '#features', isPage: false },
-    { label: 'Problem', href: '#problem', isPage: false },
+    { label: 'The 3 Traps', href: '#problem', isPage: false },
     { label: 'Comparison', href: '#comparison', isPage: false },
+    { label: 'Features', href: '#features', isPage: false },
     { label: 'Pricing', href: '#pricing', isPage: false },
     { label: 'Articles', href: '#/articles', isPage: true },
     { label: 'FAQ', href: '#faq', isPage: false },
@@ -366,11 +380,11 @@ Walkthrough: ${CALENDAR_LINK}`;
     },
     {
       q: "Who owns our data & where is it hosted?",
-      a: "The Body Corporate owns 100% of the data at all times. All records and documents are encrypted at rest and in transit, hosted on secure cloud infrastructure, and fully exportable anytime."
+      a: "The Body Corporate owns 100% of the data at all times. All records and documents are encrypted at rest and in transit on secure cloud infrastructure. We never hold your building's history hostage. You can download all of your scheme's PDFs, warranties, project histories, and decision logs in standard formats anytime, with zero exit fees."
     },
     {
       q: "Is it hard for volunteers to use?",
-      a: "No. Committee members can sign in seamlessly via Google, Apple, or secure email credentials. It is designed specifically for time-poor volunteers with intuitive dashboards and zero steep learning curve."
+      a: "No. Committee members can sign in seamlessly via Google, Apple, or secure email credentials. It is designed specifically for unpaid volunteers juggling full-time lives, with intuitive dashboards and zero steep learning curve."
     }
   ];
 
@@ -406,6 +420,9 @@ Walkthrough: ${CALENDAR_LINK}`;
                   href={link.href}
                   onClick={(e) => {
                     e.preventDefault();
+                    if (link.href === '#pricing') {
+                      trackPricingClick('header_nav');
+                    }
                     if (link.isPage) {
                       navigateToArticles();
                     } else {
@@ -425,8 +442,8 @@ Walkthrough: ${CALENDAR_LINK}`;
 
             {/* Desktop CTA */}
             <div className="hidden md:flex items-center gap-3">
-              <Button href={CALENDAR_LINK}>
-                Book a 30-Min Walkthrough
+              <Button href={CALENDAR_LINK} onClick={() => trackWalkthroughClick('header_cta')}>
+                Book a 15-Min Walkthrough
               </Button>
             </div>
 
@@ -462,6 +479,9 @@ Walkthrough: ${CALENDAR_LINK}`;
                 href={link.href}
                 onClick={(e) => {
                   e.preventDefault();
+                  if (link.href === '#pricing') {
+                    trackPricingClick('mobile_nav');
+                  }
                   if (link.isPage) {
                     navigateToArticles();
                   } else {
@@ -478,8 +498,8 @@ Walkthrough: ${CALENDAR_LINK}`;
               </a>
             ))}
             <div className="pt-2">
-              <Button href={CALENDAR_LINK} className="w-full">
-                Book a 30-Min Walkthrough
+              <Button href={CALENDAR_LINK} className="w-full" onClick={() => trackWalkthroughClick('mobile_menu_cta')}>
+                Book a 15-Min Walkthrough
               </Button>
             </div>
           </div>
@@ -517,7 +537,7 @@ Walkthrough: ${CALENDAR_LINK}`;
                 {/* H1 */}
                 <FadeIn>
                   <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-950 tracking-tight leading-[1.12] mb-6 text-balance">
-                    Stop Running Your Strata Committee Out of Your Inbox.
+                    Stop Running Your Strata Committee <br /> Out of Your Inbox
                   </h1>
                 </FadeIn>
 
@@ -531,8 +551,12 @@ Walkthrough: ${CALENDAR_LINK}`;
                 {/* CTAs */}
                 <FadeIn delay={0.3}>
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
-                    <Button href={CALENDAR_LINK} className="w-full sm:w-auto px-8 py-3.5 text-base shadow-lg shadow-blue-600/20 group">
-                      Book a 30-Minute Walkthrough
+                    <Button
+                      href={CALENDAR_LINK}
+                      onClick={() => trackWalkthroughClick('hero_cta')}
+                      className="w-full sm:w-auto px-8 py-3.5 text-base shadow-lg shadow-blue-600/20 group"
+                    >
+                      Book a 15-Min Walkthrough
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform inline-block" />
                     </Button>
                     <Button href="#features" primary={false} className="w-full sm:w-auto px-7 py-3.5 text-base">
@@ -677,7 +701,7 @@ Walkthrough: ${CALENDAR_LINK}`;
             </div>
           </section>
 
-          {/* 4. COMPARISON MATRIX: Why Your Strata Manager's Portal Isn't Enough */}
+          {/* 4. COMPARISON: Why Your Strata Manager's Portal Isn't Enough */}
           <section id="comparison" className="py-24 bg-slate-50 border-b border-slate-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="max-w-3xl mx-auto text-center mb-16">
@@ -686,7 +710,7 @@ Walkthrough: ${CALENDAR_LINK}`;
                     Why Your Strata Manager's Portal Isn't Enough
                   </h2>
                   <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-                    Traditional strata portals are built for agency portfolio management (trust accounting and levy notices). CommonKey is built specifically for committee governance and continuity.
+                    Traditional strata portals are built for agency trust accounting and levy notices—not day-to-day committee governance. CommonKey is built specifically for committee governance and continuity.
                   </p>
                 </FadeIn>
               </div>
@@ -726,7 +750,7 @@ Walkthrough: ${CALENDAR_LINK}`;
                           <span>Instant Self-Serve</span>
                         </div>
                         <p className="text-xs sm:text-sm text-emerald-900/80 leading-relaxed flex-1">
-                          A free, lightning-fast archive where any committee member can find records and context in seconds.
+                          An unlimited, lightning-fast archive where any committee member can find records and context in seconds—with zero search fees.
                         </p>
                       </div>
                     </div>
@@ -756,7 +780,7 @@ Walkthrough: ${CALENDAR_LINK}`;
                           <span>Automated Protection</span>
                         </div>
                         <p className="text-xs sm:text-sm text-emerald-900/80 leading-relaxed flex-1">
-                          Real-time visual tracking of statutory deadlines so you are never caught off guard.
+                          Proactive visual tracking of statutory deadlines, so you are never caught off guard.
                         </p>
                       </div>
                     </div>
@@ -803,7 +827,7 @@ Walkthrough: ${CALENDAR_LINK}`;
               <FadeIn className="max-w-5xl mx-auto mb-24 sm:mb-28">
                 <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-12">
                   <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight mb-4 text-balance">
-                    Built for the Heavy Lifters—and the &ldquo;Just Tell Me Where to Vote&rdquo; Members.
+                    Built for the Heavy Lifters—and the &ldquo;Just Tell Me Where to Vote&rdquo; Members
                   </h2>
                   <p className="text-slate-600 text-base sm:text-lg leading-relaxed text-balance">
                     Whether you&apos;re driving every project or only checking in once a month, you shouldn&apos;t have to dig through weeks of emails to know what&apos;s happening. Open one screen that shows only what needs your action today—review the quote, cast your vote in 60 seconds, and get back to your life.
@@ -839,7 +863,7 @@ Walkthrough: ${CALENDAR_LINK}`;
                       Never Miss an Audit (and Protect Yourself from Liability)
                     </h3>
                     <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-                      Stop worrying about what you might have forgotten. CommonKey provides real-time, visual tracking of fire safety, lift audits, and statutory deadlines.
+                      Stop worrying about what you might have forgotten. CommonKey provides proactive, visual tracking of fire safety, lift audits, and statutory deadlines.
                     </p>
                     <ul className="space-y-3 pt-2 text-sm text-slate-700 font-medium">
                       <li className="flex items-start gap-2.5">
@@ -848,7 +872,7 @@ Walkthrough: ${CALENDAR_LINK}`;
                       </li>
                       <li className="flex items-start gap-2.5">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                        <span>Clear matrix of upcoming deadlines.</span>
+                        <span>Statutory Compliance Register of upcoming deadlines.</span>
                       </li>
                       <li className="flex items-start gap-2.5">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -860,8 +884,8 @@ Walkthrough: ${CALENDAR_LINK}`;
                   <FadeIn delay={0.2} className="lg:col-span-7">
                     <BrowserFrame 
                       src={ASSETS.compliance} 
-                      alt="CommonKey Compliance Matrix"
-                      badge="Statutory Compliance"
+                      alt="CommonKey Statutory Compliance Register"
+                      badge="Statutory Compliance Register"
                     />
                   </FadeIn>
                 </div>
@@ -958,10 +982,10 @@ Walkthrough: ${CALENDAR_LINK}`;
                       <span>The Research Hub</span>
                     </div>
                     <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                      Find the Answer, Not Just the File.
+                      The Research Hub — Ask a Question, Get the Answer in 5 Seconds
                     </h3>
                     <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-                      Stop waiting days for your strata manager to reply—or paying their hourly rate just to explain a past decision. CommonKey’s Research Hub is an intelligent search engine for your committee that does the detective work for you, instantly pulling together documents, context, and history.
+                      Don&apos;t waste your Sunday opening 50 unindexed PDFs. Just type a plain-English question into the search bar—like &apos;When does our roof membrane warranty expire?&apos; or &apos;What are our pet approval rules?&apos;—and CommonKey instantly pulls the exact answer and source document from across your entire building&apos;s context. All searches are 100% private to you.
                     </p>
                     <ul className="space-y-3.5 pt-2 text-sm text-slate-700">
                       <li className="flex items-start gap-2.5">
@@ -1000,8 +1024,8 @@ Walkthrough: ${CALENDAR_LINK}`;
               <div className="text-center max-w-3xl mx-auto mb-16">
                 <FadeIn>
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-950 tracking-tight leading-tight mb-6">
-                    <span>Transparent Pricing.</span>
-                    <span className="block mt-1 sm:mt-2 text-blue-600">Zero Search Fees.</span>
+                    <span>Transparent Pricing</span>
+                    <span className="block mt-1 sm:mt-2 text-blue-600">Zero Search Fees</span>
                   </h2>
                   <p className="text-slate-700 text-base sm:text-lg leading-relaxed text-balance">
                     Stop paying steep hourly rates every time you need a historical document. CommonKey secures your building for the year for less than a typical strata manager call-out. Designed to fit comfortably inside your existing Administrative Fund, you can approve this via a simple committee vote today.
@@ -1013,12 +1037,12 @@ Walkthrough: ${CALENDAR_LINK}`;
               <FadeIn delay={0.15}>
                 <div className="bg-white border-2 border-blue-600/30 rounded-3xl shadow-xl shadow-blue-950/5 overflow-hidden transition-all hover:border-blue-600/50">
                   {/* Banner */}
-                  <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white px-6 py-3.5 text-center text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 tracking-wider uppercase shadow-xs">
+                  <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white px-4 sm:px-6 py-3.5 text-center text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 tracking-wider uppercase shadow-xs">
                     <Clock className="w-4 h-4 text-blue-200 shrink-0" />
                     <span>2026 Introductory Rate</span>
                   </div>
 
-                  <div className="p-8 sm:p-12">
+                  <div className="p-4 sm:p-8 lg:p-12">
                     {/* Rate Strikethrough & Overview */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-8 border-b border-slate-200">
                       <div>
@@ -1038,7 +1062,7 @@ Walkthrough: ${CALENDAR_LINK}`;
 
                     {/* Scheme Parameters & Guarantee Grid */}
                     <div className="grid md:grid-cols-3 gap-6 py-8 border-b border-slate-200">
-                      <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5.5 flex flex-col justify-between">
+                      <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between">
                         <div>
                           <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                             Minimum Scheme Rate
@@ -1052,7 +1076,7 @@ Walkthrough: ${CALENDAR_LINK}`;
                         </div>
                       </div>
 
-                      <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5.5 flex flex-col justify-between">
+                      <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between">
                         <div>
                           <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                             Large Scheme Cap
@@ -1066,7 +1090,7 @@ Walkthrough: ${CALENDAR_LINK}`;
                         </div>
                       </div>
 
-                      <div className="bg-emerald-50/70 border border-emerald-200/90 rounded-2xl p-5.5 flex flex-col justify-between">
+                      <div className="bg-emerald-50/70 border border-emerald-200/90 rounded-2xl p-5 flex flex-col justify-between">
                         <div>
                           <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                             <ShieldCheck className="w-4 h-4 text-emerald-600" />
@@ -1083,9 +1107,9 @@ Walkthrough: ${CALENDAR_LINK}`;
                     </div>
 
                     {/* Interactive Calculator Block (Positioned below the scheme parameters & guarantee cards) */}
-                    <div className="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-6 sm:p-8 my-8 shadow-sm">
+                    <div className="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-4 sm:p-8 my-8 shadow-sm overflow-hidden">
                       <div className="max-w-3xl mx-auto">
-                        <div className="text-center mb-8">
+                        <div className="text-center mb-6 sm:mb-8">
                           <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight mb-2">
                             Calculate Your Building's Cost
                           </h3>
@@ -1094,11 +1118,11 @@ Walkthrough: ${CALENDAR_LINK}`;
                           </p>
                         </div>
 
-                        <div className="grid lg:grid-cols-12 gap-8 items-center bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center bg-white border border-slate-200 rounded-2xl p-4 sm:p-8 shadow-sm">
                           {/* Input controls */}
-                          <div className="lg:col-span-6 space-y-5">
+                          <div className="lg:col-span-6 min-w-0 space-y-5">
                             <div>
-                              <div className="flex justify-between items-center mb-2">
+                              <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
                                 <label htmlFor="lots-input" className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                                   Enter Number of Lots
                                 </label>
@@ -1125,7 +1149,9 @@ Walkthrough: ${CALENDAR_LINK}`;
                                     }
                                     const parsed = parseInt(raw, 10);
                                     if (!isNaN(parsed)) {
-                                      setLotsCount(Math.max(1, Math.min(300, parsed)));
+                                      const clamped = Math.max(1, Math.min(300, parsed));
+                                      setLotsCount(clamped);
+                                      trackCalculatorInteraction('input_change', clamped, calculateAnnualCost(clamped));
                                     }
                                   }}
                                   placeholder="e.g., 12"
@@ -1148,11 +1174,15 @@ Walkthrough: ${CALENDAR_LINK}`;
                                 min={1}
                                 max={60}
                                 value={Math.min(60, effectiveLots)}
-                                onChange={(e) => setLotsCount(parseInt(e.target.value, 10))}
+                                onChange={(e) => {
+                                  const nextLots = parseInt(e.target.value, 10);
+                                  setLotsCount(nextLots);
+                                  trackCalculatorInteraction('slider_change', nextLots, calculateAnnualCost(nextLots));
+                                }}
                                 className="w-full accent-blue-600 cursor-pointer h-2 bg-slate-200 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                                 aria-label="Adjust lots count slider"
                               />
-                              <div className="flex justify-between text-[11px] text-slate-500 mt-1 font-mono">
+                              <div className="flex flex-wrap justify-between gap-x-2 gap-y-1 text-[10px] sm:text-[11px] text-slate-500 mt-1 font-mono">
                                 <span>1-8 lots ($299 floor)</span>
                                 <span>12 lots ($432)</span>
                                 <span>25+ lots ($899 cap)</span>
@@ -1161,27 +1191,23 @@ Walkthrough: ${CALENDAR_LINK}`;
 
                             {/* Quick selection pills */}
                             <div className="pt-1">
-                              <span className="block text-xs text-slate-500 font-semibold mb-2">Quick presets:</span>
-                              <div className="flex flex-wrap gap-1.5">
-                                {[
-                                  { label: '4 (Duplex)', val: 4 },
-                                  { label: '8 (Floor)', val: 8 },
-                                  { label: '12 (Townhouses)', val: 12 },
-                                  { label: '18 (Mid-rise)', val: 18 },
-                                  { label: '25 (Capped)', val: 25 },
-                                  { label: '50 (High-rise)', val: 50 }
-                                ].map((preset) => (
+                              <span className="block text-xs text-slate-500 font-semibold mb-2">Lot quick presets:</span>
+                              <div className="grid grid-cols-6 gap-2">
+                                {[4, 8, 12, 18, 25, 50].map((val) => (
                                   <button
-                                    key={preset.val}
+                                    key={val}
                                     type="button"
-                                    onClick={() => setLotsCount(preset.val)}
-                                    className={`px-2.5 py-1 text-xs rounded-lg font-medium transition-colors cursor-pointer border ${
-                                      effectiveLots === preset.val 
+                                    onClick={() => {
+                                      setLotsCount(val);
+                                      trackCalculatorInteraction('preset_click', val, calculateAnnualCost(val));
+                                    }}
+                                    className={`px-2 py-1.5 text-xs rounded-lg font-semibold tabular-nums transition-colors cursor-pointer border text-center ${
+                                      effectiveLots === val 
                                         ? 'bg-blue-600 text-white border-blue-600 shadow-xs' 
                                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200/80'
                                     }`}
                                   >
-                                    {preset.label}
+                                    {val}
                                   </button>
                                 ))}
                               </div>
@@ -1189,23 +1215,23 @@ Walkthrough: ${CALENDAR_LINK}`;
                           </div>
 
                           {/* Calculated Output Display */}
-                          <div className="lg:col-span-6 bg-gradient-to-br from-blue-50/90 to-indigo-50/70 border border-blue-200/90 rounded-2xl p-6 sm:p-7 text-center flex flex-col justify-center">
+                          <div className="lg:col-span-6 min-w-0 bg-gradient-to-br from-blue-50/90 to-indigo-50/70 border border-blue-200/90 rounded-2xl p-4 sm:p-7 text-center flex flex-col justify-center">
                             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                               Your Annual Subscription:
                             </div>
 
-                            <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight mb-1 tabular-nums">
-                              ${calculatedAnnualCost.toLocaleString()}
-                              <span className="text-base sm:text-lg font-bold text-slate-600 ml-2">
+                            <div className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight mb-1 tabular-nums flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1">
+                              <span>${calculatedAnnualCost.toLocaleString()}</span>
+                              <span className="text-sm sm:text-lg font-bold text-slate-600">
                                 + GST / year
                               </span>
                             </div>
 
-                            <div className="text-xs text-slate-600 font-medium mb-3">
+                            <div className="text-xs text-slate-600 font-medium mb-3 break-words">
                               ≈ ${(calculatedAnnualCost / effectiveLots / 52).toFixed(2)}/week per apartment (${Math.round(calculatedAnnualCost / effectiveLots)}/lot/year)
                             </div>
 
-                            <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-semibold border border-emerald-200/90 mb-6 max-w-fit mx-auto">
+                            <div className="inline-flex flex-wrap items-center justify-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-semibold border border-emerald-200/90 mb-6 max-w-full mx-auto text-balance">
                               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                               <span>You are saving ${calculatedSavings.toLocaleString()}/year compared to standard pricing!</span>
                             </div>
@@ -1213,10 +1239,11 @@ Walkthrough: ${CALENDAR_LINK}`;
                             <div className="space-y-3">
                               <Button 
                                 href={CALENDAR_LINK}
+                                onClick={() => trackCalculatorInteraction('claim_rate_click', effectiveLots, calculatedAnnualCost)}
                                 className="w-full py-3.5 text-base shadow-lg shadow-blue-600/25 group"
                               >
                                 Claim Your Rate & Book a Tour
-                                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform inline-block" />
+                                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform inline-block shrink-0" />
                               </Button>
 
                               <p className="text-xs text-slate-500 font-medium text-center">
@@ -1237,17 +1264,17 @@ Walkthrough: ${CALENDAR_LINK}`;
                               <button
                                 type="button"
                                 onClick={handleCopyProposal}
-                                className="w-full py-2.5 px-4 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                                className="w-full py-2.5 px-3 sm:px-4 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 text-center"
                                 title="Copy a structured summary to paste into an email or AGM agenda"
                               >
                                 {copiedProposal ? (
                                   <>
-                                    <Check className="w-4 h-4 text-emerald-600" />
+                                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                                     <span className="text-emerald-700 font-bold">Proposal Summary Copied to Clipboard!</span>
                                   </>
                                 ) : (
                                   <>
-                                    <Copy className="w-4 h-4 text-slate-500" />
+                                    <Copy className="w-4 h-4 text-slate-500 shrink-0" />
                                     <span>Copy Summary for Committee Vote</span>
                                   </>
                                 )}
@@ -1428,7 +1455,7 @@ Walkthrough: ${CALENDAR_LINK}`;
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
               <FadeIn>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-6 text-balance">
-                  Stop Running Your Strata Committee Out of Your Inbox.
+                  Stop Running Your Strata Committee Out of Your Inbox
                 </h2>
                 <p className="text-lg sm:text-xl text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed text-balance">
                   Protect your building's history, eliminate single-person dependency, and reclaim your weekends. Lock in the Founding Committee rate before spots fill up for the year.
@@ -1436,10 +1463,11 @@ Walkthrough: ${CALENDAR_LINK}`;
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
                   <Button 
                     href={CALENDAR_LINK}
+                    onClick={() => trackWalkthroughClick('bottom_cta')}
                     className="w-full sm:w-auto px-8 sm:px-10 py-4 text-base sm:text-lg shadow-xl shadow-blue-600/30 group"
                   >
-                    Claim Your Spot: Book a 30-Minute Walkthrough
-                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform inline-block" />
+                    Claim Your Spot: Book a 15-Min Walkthrough
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform inline-block shrink-0" />
                   </Button>
                   <Button
                     href="#register-interest"
@@ -1505,7 +1533,10 @@ Walkthrough: ${CALENDAR_LINK}`;
                 Home
               </button>
               <button 
-                onClick={() => navigateToHomeSection('#pricing')} 
+                onClick={() => {
+                  trackPricingClick('footer_nav');
+                  navigateToHomeSection('#pricing');
+                }} 
                 className="hover:text-white transition-colors cursor-pointer"
               >
                 Pricing

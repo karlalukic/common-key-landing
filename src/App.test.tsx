@@ -27,19 +27,24 @@ describe('App Component', () => {
       expect(logoLinks[0]).toHaveAttribute('href', '#');
     });
 
-    it('renders all desktop navigation links with correct destinations', () => {
+    it('renders all desktop navigation links in vertical scroll order with correct destinations', () => {
       render(<App />);
       const nav = screen.getByRole('navigation');
       expect(nav).toBeInTheDocument();
 
       const expectedLinks = [
-        { label: 'Features', href: '#features' },
-        { label: 'Problem', href: '#problem' },
+        { label: 'The 3 Traps', href: '#problem' },
         { label: 'Comparison', href: '#comparison' },
+        { label: 'Features', href: '#features' },
         { label: 'Pricing', href: '#pricing' },
         { label: 'Articles', href: '#/articles' },
         { label: 'FAQ', href: '#faq' },
       ];
+
+      const renderedNavLinks = Array.from(nav.querySelectorAll('a'));
+      expect(renderedNavLinks.map((a) => a.textContent)).toEqual(
+        expectedLinks.map((l) => l.label)
+      );
 
       expectedLinks.forEach(({ label, href }) => {
         const link = screen.getByRole('link', { name: label });
@@ -75,20 +80,21 @@ describe('App Component', () => {
 
   // Suite 3: Hero Section
   describe('Suite 3: Hero Section', () => {
-    it('displays the main headline and value proposition subtext', () => {
+    it('displays the main headline with a line break after Committee and value proposition subtext', () => {
       render(<App />);
       const heroHeadings = screen.getAllByRole('heading', { level: 1 });
-      expect(heroHeadings[0]).toHaveTextContent('Stop Running Your Strata Committee Out of Your Inbox.');
+      expect(heroHeadings[0]).toHaveTextContent('Stop Running Your Strata Committee Out of Your Inbox');
+      expect(heroHeadings[0].querySelector('br')).toBeInTheDocument();
 
       expect(
         screen.getByText(/The independent governance software that protects Australian volunteer committees/i)
       ).toBeInTheDocument();
     });
 
-    it('renders the walkthrough CTA button pointing to Google Calendar booking', () => {
+    it('renders the 15-min walkthrough CTA button pointing to Google Calendar booking', () => {
       render(<App />);
-      const walkthroughLinks = screen.getAllByRole('link', { name: /Book a 30-Minute Walkthrough/i });
-      expect(walkthroughLinks.length).toBeGreaterThanOrEqual(1);
+      const walkthroughLinks = screen.getAllByRole('link', { name: /Book a 15-Min Walkthrough/i });
+      expect(walkthroughLinks.length).toBeGreaterThanOrEqual(2);
       expect(walkthroughLinks[0]).toHaveAttribute('href', 'https://calendar.app.google/LnCqDH1YajG5Wx417');
       expect(walkthroughLinks[0]).toHaveAttribute('target', '_blank');
       expect(walkthroughLinks[0]).toHaveAttribute('rel', 'noopener noreferrer');
@@ -111,7 +117,7 @@ describe('App Component', () => {
       render(<App />);
       expect(
         screen.getByRole('heading', {
-          name: /Built for the Heavy Lifters—and the “Just Tell Me Where to Vote” Members\./i,
+          name: /Built for the Heavy Lifters—and the “Just Tell Me Where to Vote” Members/i,
         })
       ).toBeInTheDocument();
       const dashboardImg = screen.getByAltText(/CommonKey Committee Governance Dashboard/i);
@@ -124,7 +130,7 @@ describe('App Component', () => {
   describe('Suite 4: Hash-Based Client Routing', () => {
     it('switches to ArticlesPage when window.location.hash is set to #/articles', () => {
       render(<App />);
-      expect(screen.getAllByRole('heading', { name: /Stop Running Your Strata Committee Out of Your Inbox\./i })[0]).toBeInTheDocument();
+      expect(screen.getAllByRole('heading', { name: /Stop Running Your Strata Committee Out of Your Inbox/i })[0]).toBeInTheDocument();
 
       act(() => {
         window.location.hash = '#/articles';
@@ -135,7 +141,7 @@ describe('App Component', () => {
         screen.getByRole('heading', { name: /Published Insights for Body Corporate Committees/i })
       ).toBeInTheDocument();
       expect(
-        screen.queryAllByRole('heading', { name: /Stop Running Your Strata Committee Out of Your Inbox\./i })
+        screen.queryAllByRole('heading', { name: /Stop Running Your Strata Committee Out of Your Inbox/i })
       ).toHaveLength(0);
     });
 
@@ -178,7 +184,7 @@ describe('App Component', () => {
         window.dispatchEvent(new Event('hashchange'));
       });
 
-      expect(screen.getAllByRole('heading', { name: /Stop Running Your Strata Committee Out of Your Inbox\./i })[0]).toBeInTheDocument();
+      expect(screen.getAllByRole('heading', { name: /Stop Running Your Strata Committee Out of Your Inbox/i })[0]).toBeInTheDocument();
     });
   });
 
@@ -238,19 +244,19 @@ describe('App Component', () => {
     it('updates lot count and calculates price when clicking preset buttons', () => {
       render(<App />);
 
-      // Preset 4 (Duplex)
-      const duplexPreset = screen.getByRole('button', { name: /4 \(Duplex\)/i });
+      // Preset 4
+      const duplexPreset = screen.getByRole('button', { name: '4' });
       fireEvent.click(duplexPreset);
       expect(screen.getAllByText('$299').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('Minimum Floor Applied')).toBeInTheDocument();
 
-      // Preset 18 (Mid-rise)
-      const midRisePreset = screen.getByRole('button', { name: /18 \(Mid-rise\)/i });
+      // Preset 18
+      const midRisePreset = screen.getByRole('button', { name: '18' });
       fireEvent.click(midRisePreset);
       expect(screen.getByText('$648')).toBeInTheDocument();
 
-      // Preset 25 (Capped)
-      const cappedPreset = screen.getByRole('button', { name: /25 \(Capped\)/i });
+      // Preset 25
+      const cappedPreset = screen.getByRole('button', { name: '25' });
       fireEvent.click(cappedPreset);
       expect(screen.getByText('$899')).toBeInTheDocument();
       expect(screen.getByText('Large Scheme Cap Active')).toBeInTheDocument();
@@ -271,10 +277,40 @@ describe('App Component', () => {
         expect.stringContaining('CommonKey Annual Subscription: $432 + GST / year')
       );
 
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+        expect.stringContaining('Includes: Statutory Compliance Register')
+      );
+
       // Verify button feedback state
       expect(
         screen.getByText(/Proposal Summary Copied to Clipboard!/i)
       ).toBeInTheDocument();
+    });
+
+    it('tracks Pricing clicks and calculator interactions in dataLayer', () => {
+      window.dataLayer = [];
+      render(<App />);
+
+      const pricingNavLink = screen.getByRole('link', { name: 'Pricing' });
+      fireEvent.click(pricingNavLink);
+      expect(window.dataLayer).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ event: 'pricing_click', source: 'header_nav' }),
+        ])
+      );
+
+      const preset25 = screen.getByRole('button', { name: '25' });
+      fireEvent.click(preset25);
+      expect(window.dataLayer).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            event: 'calculator_interaction',
+            action: 'preset_click',
+            lots_count: 25,
+            annual_cost: 899,
+          }),
+        ])
+      );
     });
   });
 
