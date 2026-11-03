@@ -278,7 +278,7 @@ describe('ArticlesPage Component', () => {
       render(<ArticlesPage {...defaultProps} currentArticleSlug="test-article-1" />);
 
       expect(screen.getByText(/Keep your building's permanent history in committee hands\./i)).toBeInTheDocument();
-      const ctaLink = screen.getByRole('link', { name: /Book 30-Min Walkthrough/i });
+      const ctaLink = screen.getByRole('link', { name: /Book a 15-Min Walkthrough/i });
       expect(ctaLink).toHaveAttribute('href', defaultProps.calendarLink);
       expect(ctaLink).toHaveAttribute('target', '_blank');
     });

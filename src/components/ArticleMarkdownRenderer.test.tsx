@@ -245,5 +245,38 @@ describe('ArticleMarkdownRenderer', () => {
       expect(span).toBeInTheDocument();
       expect(span).toHaveTextContent('Verified Statutory Right');
     });
+
+    it('renders the StrataMax vertical chart HTML block without turning indented tags into code blocks', async () => {
+      const { ARTICLES } = await import('../data/articles');
+      const strataMaxArticle = ARTICLES.find(
+        (a) => a.slug === 'caught-in-the-same-broken-system-committee-frustration-and-strata-manager-burnout'
+      )!;
+      const chartHtml = strataMaxArticle.content.sections[1].paragraphs[2];
+      const { container } = render(<ArticleMarkdownRenderer content={chartHtml} />);
+
+      expect(container.querySelector('code')).toBeNull();
+      expect(screen.getByText('Rising Committee Frustration Over 8 Years')).toBeInTheDocument();
+      expect(screen.getByText('Slow Response Time')).toBeInTheDocument();
+      expect(screen.getByText('Poor Communication')).toBeInTheDocument();
+      expect(screen.getByText('26%')).toBeInTheDocument();
+      expect(screen.getByText('31%')).toBeInTheDocument();
+      expect(screen.getByText('12%')).toBeInTheDocument();
+      expect(screen.getByText('15%')).toBeInTheDocument();
+    });
+
+    it('renders the National Crackdown on Strata Commissions snapshot card cleanly as HTML', async () => {
+      const { ARTICLES } = await import('../data/articles');
+      const commissionsArticle = ARTICLES.find(
+        (a) => a.slug === 'the-end-of-strata-kickbacks-victoria-and-nsw-crackdowns-on-commissions'
+      )!;
+      const snapshotHtml = commissionsArticle.content.sections[2].paragraphs[2];
+      const { container } = render(<ArticleMarkdownRenderer content={snapshotHtml} />);
+
+      expect(container.querySelector('code')).toBeNull();
+      expect(screen.getByText('The National Crackdown on Strata Commissions')).toBeInTheDocument();
+      expect(screen.getByText('Victoria')).toBeInTheDocument();
+      expect(screen.getByText('New South Wales')).toBeInTheDocument();
+      expect(screen.getByText('Transparent Fee-for-Service')).toBeInTheDocument();
+    });
   });
 });

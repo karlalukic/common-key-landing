@@ -290,7 +290,7 @@ export default function ArticlesPage({
               rel="noopener noreferrer"
               className="shrink-0 px-6 py-3.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-blue-500/25 transition-all inline-flex items-center gap-2"
             >
-              Book 30-Min Walkthrough
+              Book a 15-Min Walkthrough
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>

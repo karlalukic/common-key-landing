@@ -21,6 +21,8 @@ describe('articles data repository', () => {
 
     it('contains all canonical published strata governance articles', () => {
       const slugs = getAllArticles().map((a) => a.slug);
+      expect(slugs).toContain('the-end-of-strata-kickbacks-victoria-and-nsw-crackdowns-on-commissions');
+      expect(slugs).toContain('caught-in-the-same-broken-system-committee-frustration-and-strata-manager-burnout');
       expect(slugs).toContain('software-surcharges-vs-data-sovereignty-are-you-renting-your-own-records');
       expect(slugs).toContain('document-search-fee-statutory-access-rights-vs-proprietary-gatekeepers');
       expect(slugs).toContain('schedule-b-trap-base-strata-fee-doubles');
@@ -93,6 +95,7 @@ describe('articles data repository', () => {
           if (section.heading !== undefined) {
             expect(typeof section.heading).toBe('string');
             expect(section.heading.trim().length).toBeGreaterThan(0);
+            expect(section.heading.toLowerCase()).not.toContain('receipt');
           }
         }
       }
@@ -102,7 +105,7 @@ describe('articles data repository', () => {
       const articles = getAllArticles();
       const featuredArticles = articles.filter((a) => a.featured === true);
       expect(featuredArticles).toHaveLength(1);
-      expect(featuredArticles[0].slug).toBe('software-surcharges-vs-data-sovereignty-are-you-renting-your-own-records');
+      expect(featuredArticles[0].slug).toBe('the-end-of-strata-kickbacks-victoria-and-nsw-crackdowns-on-commissions');
     });
   });
 
